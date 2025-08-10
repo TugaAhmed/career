@@ -6,10 +6,13 @@ from .models import Job
 from .serializers import  JobListSerializer , JobDetailSerializer , JobUpdateSerializer
 from users.permissions import IsCompany
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.generics import RetrieveUpdateDestroyAPIView
 
-
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.views import APIView
 from .serializers import JobCreateSerializer , CompanyJobListSerializer
+from django.db.models import Count
+
 
 class IsCompanyUser:
     """Custom permission: user must have role 'company'"""
