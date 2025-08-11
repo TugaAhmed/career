@@ -4,40 +4,67 @@ A RESTful API for companies to manage job postings and applicants to browse and 
 
 ---
 
-## Technology Stack
-
-- **Django & Django REST Framework**: Rapid API development with built-in admin, authentication, and serialization.
-- **Django Filter**: For advanced filtering capabilities.
-- **Simple JWT**: Secure JSON Web Tokens for authentication.
-- **Cloudinary**: Cloud-based file storage and CDN for resumes.
-- **PostgreSQL** (recommended): Robust and scalable database (you can use SQLite for local testing).
-- **Python-dotenv**: Manage environment variables.
-
----
-
 ## Setup & Run Locally
 
-1. Clone the repository:
-
+--> Clone the repository:
+```bash
 git clone https://github.com/TugaAhmed/career.git
+```
 
-2. Install dependencies:
+--> Install dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+
+--> Create a virtual environment :
+```bash
+
+pip install virtualenv
+
+virtualenv envname
+
+```
+
+--> Activate the virtual environment :
+```bash
+envname\scripts\activate
+
+```
+
+--> Install the requirements :
+```bash
 pip install -r requirements.txt
 
+```
+
+#
+
+### Running the App
+
+```bash
+python manage.py runserver
+
+```
+
+### the development server will be started at http://127.0.0.1:8000/
+
+#
 
 
 
-1. Signup example :
-Write in terminal 
+## Signup example :
+```bash
 Invoke-WebRequest 
   -Uri "http://127.0.0.1:8000/api/auth/signup/" 
   -Method POST 
   -ContentType "application/json" 
-  -Body '{"full_name": "Noha Ahmed", "email": "nohanoha295@gmail.com
+  -Body '{"full_name": "Noha Ahmed", "email": "example@gmail.com
 ", "password": "StrongPass@123", "role": "company"}'
-
+```
 
 Response :
+```bash
 StatusCode        : 201
 StatusDescription : Created
 Content           : {"id":"7966033f-08f7-4adc-9bb8-c721b6ab87a2","email":"john@example.com","role":"applicant"}
@@ -58,7 +85,7 @@ InputFields       : {}
 Links             : {}
 ParsedHtml        : mshtml.HTMLDocumentClass
 RawContentLength  : 91
-
+```
 
 Token : Check email or you'll find the token printed in the terminal window where your Django server is running
 
@@ -66,22 +93,33 @@ Click the link to verify your email: http://example.com/api/verify-email?token=j
 
 
 
-2. Login example :
+## Login example :
+``` bash
 $response = Invoke-RestMethod -Uri http://127.0.0.1:8000/api/auth/login/ -Method POST -Body '{"email":"john@example.com","password":"strongpass@123"}' -ContentType "application/json"
-
+```
 
 Response : 
-
+``` bash
 success message          object
 ------- -------          ------
-   True Login successful @{refresh=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ey...
+   True Login successful @{refresh=eyJhbGciOiJIUzI1N............
 
 \
+```
 
-
-3. Add job example : 
+##  Add job example : 
 After signup as company and login , get token from response and create a job  
 
+```bash
 $token = $response.object.access
 
 Invoke-RestMethod -Uri http://127.0.0.1:8000/api/jobs/create/ -Method POST -Body $jobData -ContentType "application/json" -Headers @{Authorization = "Bearer $token"}
+
+```
+Response : 
+
+```bash
+success message                  object
+------- -------                  ------
+   True Job created successfully @{id=a72dc120-0584-4f73-9b7702............
+```
