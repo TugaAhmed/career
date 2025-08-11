@@ -2,6 +2,12 @@
 import re
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
+from django.utils.text import slugify
+import uuid
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.core.mail import send_mail
+token_generator = PasswordResetTokenGenerator()
+
 
 User = get_user_model()
 
@@ -46,6 +52,48 @@ class SignupSerializer(serializers.ModelSerializer):
         user.is_active = False  # User inactive until email verified
         user.save()
         return user
+    
+    
+    def create(self, validated_data):
+        full_name = validated_data.pop('full_name')
+        first_name, last_name = full_name.split(' ', 1)
+        validated_data['first_name'] = first_name
+        validated_data['last_name'] = last_name
+
+        # Generate unique username based on email or full_name or random UUID
+        base_username = slugify(first_name + last_name)  # e.g. "nohaahmed"
+        username = base_username
+        counter = 1
+
+        while User.objects.filter(username=username).exists():
+            username = f"{base_username}{counter}"
+            counter += 1
+
+        validated_data['username'] = username
+
+        password = validated_data.pop('password')
+        user = User(**validated_data)
+        user.set_password(password)
+        user.is_active = False  # User inactive until email verified
+        user.save()
+
+        # Generate token
+        token = token_generator.make_token(user)
+        uid = user.pk  # or use urlsafe_base64_encode for safer encoding if you want
+
+        # Build activation URL (adjust your frontend or backend URL accordingly)
+        activation_url = f"http://127.0.0.1:8000/api/auth/activate/{uid}/{token}/"
+
+        # Send activation email
+        send_mail(
+            subject='Activate your account',
+            message=f'Hi {user.first_name}, please activate your account by clicking the link: {activation_url}',
+            from_email=None,  # uses DEFAULT_FROM_EMAIL
+            recipient_list=[user.email],
+            fail_silently=False,
+        )
+        return user
+    
 
 
 

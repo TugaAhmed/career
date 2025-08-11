@@ -10,11 +10,32 @@ from rest_framework.views import APIView
 
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
 
 
 
 
 signer = TimestampSigner()
+
+
+from django.shortcuts import get_object_or_404
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+
+
+class ActivateUserView(APIView):
+    def get(self, request, uid, token):
+        user = get_object_or_404(User, pk=uid)
+        token_generator = PasswordResetTokenGenerator()
+        if token_generator.check_token(user, token):
+            user.is_active = True
+            user.save()
+            return Response({"success": True, "message": "Account activated successfully"}, status=status.HTTP_200_OK)
+        else:
+            return Response({"success": False, "message": "Invalid or expired token"}, status=status.HTTP_400_BAD_REQUEST)
+
+
 
 class SignupView(generics.CreateAPIView):
     serializer_class = SignupSerializer
@@ -28,6 +49,9 @@ class SignupView(generics.CreateAPIView):
         # Construct verification URL
         verification_url = f"http://example.com/api/verify-email?token={token}"
 
+        user.is_active = True
+        user.save()
+        print("is now AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA**********************")
         # Send verification email
         send_mail(
             subject="Verify your email",
@@ -35,6 +59,8 @@ class SignupView(generics.CreateAPIView):
             from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=[user.email],
         )
+
+        
 
 
 
@@ -127,6 +153,7 @@ class LoginView(APIView):
     def post(self, request):
         email = request.data.get('email')
         password = request.data.get('password')
+        print("emial",email , "password",password)
 
         if not email or not password:
             return Response({
@@ -137,7 +164,8 @@ class LoginView(APIView):
             }, status=status.HTTP_400_BAD_REQUEST)
 
         # Authenticate user using Django's built-in authentication
-        user = authenticate(request, username=email, password=password)
+        user = authenticate(request, email=email, password=password)
+        print("UUUUUUUUUUUUUUUUUUUUUU user",user)
 
         if user is None:
             return Response({

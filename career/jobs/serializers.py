@@ -16,7 +16,6 @@ class JobCreateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Description must be between 20 and 2000 characters.")
         return value
 
-# jobs/serializers.py
 class JobUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Job

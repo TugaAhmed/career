@@ -151,12 +151,17 @@ SIMPLE_JWT = {
 }
 
 # Email dev backend (use real SMTP in prod)
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-DEFAULT_FROM_EMAIL = 'tugakareim@gmail.com'
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# DEFAULT_FROM_EMAIL = 'tugakareim@gmail.com'
 
 # Configurable limits
 MAX_UPLOAD_SIZE_MB = 5
 ALLOWED_RESUME_EXTENSIONS = ['pdf', 'docx']
 
-
-django_heroku.settings(locals())
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'sandbox.smtp.mailtrap.io'
+EMAIL_PORT = 2525
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'f642ae26a89619'
+EMAIL_HOST_PASSWORD = '4b25dac5fdcc83'  # Use App Password if 2FA is enabled
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
